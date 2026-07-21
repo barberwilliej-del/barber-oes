@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barber-OES</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12161B; --panel:#1B2127; --border:#2B333B; --text:#ECEFF1;
+    --text-dim:#9AA5B1; --text-faint:#6B7580; --amber:#E8A23D; --amber-dim:#8A6428;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    background:var(--bg); color:var(--text); font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .card{max-width:420px; width:100%; text-align:center;}
+  .mark{
+    width:56px; height:56px; border-radius:12px; margin:0 auto 20px;
+    background:linear-gradient(135deg, var(--amber), var(--amber-dim));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk'; font-weight:700; font-size:24px; color:var(--bg);
+  }
+  h1{font-family:'Space Grotesk'; font-size:26px; font-weight:700; margin-bottom:6px;}
+  .sub{font-size:13px; color:var(--text-faint); letter-spacing:0.04em; margin-bottom:8px; text-transform:uppercase;}
+  p{color:var(--text-dim); font-size:15px; line-height:1.5; margin-bottom:32px;}
+  .links{display:flex; flex-direction:column; gap:12px;}
+  a.btn{
+    display:block; padding:16px 20px; border-radius:10px; text-decoration:none;
+    font-size:15px; font-weight:500; transition:transform .15s, opacity .15s;
+  }
+  a.btn:active{transform:scale(0.98);}
+  .btn-primary{background:var(--amber); color:var(--bg); font-weight:700;}
+  .btn-secondary{background:var(--panel); color:var(--text); border:1px solid var(--border);}
+  .btn-sub{display:block; font-size:12px; font-weight:400; opacity:0.75; margin-top:3px;}
+  footer{margin-top:36px; font-size:11px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="mark">B</div>
+    <h1>Barber-OES</h1>
+    <div class="sub">Operational Ecosystem</div>
+    <p>One system for every line, batch, and shift on the floor.</p>
+    <div class="links">
+      <a class="btn btn-primary" href="Barber-OES_Live_Demo.html">
+        Try the interactive demo
+        <span class="btn-sub">Live, working prototype — click around</span>
+      </a>
+      <a class="btn btn-secondary" href="Barber-OES_Leave_Behind.pdf">
+        Download the one-pager (PDF)
+        <span class="btn-sub">Overview, results, and pricing</span>
+      </a>
+    </div>
+    <footer>Willie Barber &middot; Barber Enterprise International</footer>
+  </div>
+</body>
+</html>
