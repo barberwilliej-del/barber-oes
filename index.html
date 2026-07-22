@@ -35,6 +35,19 @@
   .btn-primary{background:var(--amber); color:var(--bg); font-weight:700;}
   .btn-secondary{background:var(--panel); color:var(--text); border:1px solid var(--border);}
   .btn-sub{display:block; font-size:12px; font-weight:400; opacity:0.75; margin-top:3px;}
+  .bio{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    padding:20px; margin-bottom:28px; text-align:left; display:flex; gap:14px; align-items:flex-start;
+  }
+  .bio-avatar{
+    width:40px; height:40px; border-radius:10px; flex-shrink:0;
+    background:linear-gradient(135deg, var(--amber), var(--amber-dim));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk'; font-weight:700; font-size:15px; color:var(--bg);
+  }
+  .bio-name{font-family:'Space Grotesk'; font-weight:700; font-size:15px; margin-bottom:2px;}
+  .bio-title{font-size:12px; color:var(--text-faint); margin-bottom:8px;}
+  .bio-text{font-size:13px; color:var(--text-dim); line-height:1.55; margin:0;}
   footer{margin-top:36px; font-size:11px; color:var(--text-faint);}
 </style>
 </head>
@@ -44,14 +57,28 @@
     <h1>Barber-OES</h1>
     <div class="sub">Operational Ecosystem</div>
     <p>One system for every line, batch, and shift on the floor.</p>
+
+    <div class="bio">
+      <div class="bio-avatar">WB</div>
+      <div>
+        <div class="bio-name">Willie Barber</div>
+        <div class="bio-title">Manufacturing Operations Leader &middot; Barber Enterprise International, LLC</div>
+        <p class="bio-text">10+ years leading plant operations across packaging, logistics, and industrial manufacturing — driving schedule attainment from 82% to 97% and OEE from 46% to 60% on floors personally run. Built Barber-OES from firsthand experience on the floor, not as an outside software vendor.</p>
+      </div>
+    </div>
+
     <div class="links">
-      <a class="btn btn-primary" href="Barber-OES_Live_Demo.html">
+      <a class="btn btn-primary" href="Barber-OES_Prototype.html">
+        See the full pitch
+        <span class="btn-sub">Problem, results, modules, pricing — one page</span>
+      </a>
+      <a class="btn btn-secondary" href="Barber-OES_Live_Demo.html">
         Try the interactive demo
         <span class="btn-sub">Live, working prototype — click around</span>
       </a>
       <a class="btn btn-secondary" href="Barber-OES_Leave_Behind.pdf">
-        Download the one-pager (PDF)
-        <span class="btn-sub">Overview, results, and pricing</span>
+        Download the full prospectus (PDF)
+        <span class="btn-sub">9 pages — take it with you</span>
       </a>
     </div>
     <footer>Willie Barber &middot; Barber Enterprise International</footer>

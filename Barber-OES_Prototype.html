@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barber-OES — Operational Ecosystem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D1013;
+    --bg-2:#0A0C0E;
+    --panel:#161B20;
+    --panel-2:#1E252B;
+    --border:#2A323A;
+    --border-soft:#20272D;
+    --text:#E7EAEC;
+    --text-dim:#8B95A1;
+    --text-faint:#565F69;
+    --amber:#E8A23D;
+    --amber-dim:#8A6428;
+    --teal:#4FB8C4;
+    --green:#4CAF7D;
+    --red:#E1553F;
+    --radius:10px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:var(--bg); color:var(--text); font-family:'IBM Plex Sans', sans-serif; -webkit-font-smoothing:antialiased;}
+  body{min-height:100vh;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .display{font-family:'Space Grotesk', sans-serif;}
+
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer;}
+
+  ::selection{background:var(--amber); color:#0D1013;}
+
+  /* ===== NAV ===== */
+  nav{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 40px;
+    background:rgba(13,16,19,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border-soft);
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{
+    width:30px; height:30px; border-radius:6px;
+    background:linear-gradient(135deg, var(--amber), var(--amber-dim));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk'; font-weight:700; font-size:14px; color:#0D1013;
+  }
+  .brand-name{font-family:'Space Grotesk'; font-weight:600; font-size:17px; letter-spacing:0.01em;}
+  .brand-sub{font-size:11px; color:var(--text-faint); font-family:'IBM Plex Mono'; letter-spacing:0.04em; margin-top:1px;}
+  .nav-links{display:flex; gap:32px; align-items:center;}
+  .nav-links a{font-size:14px; color:var(--text-dim); transition:color .15s;}
+  .nav-links a:hover{color:var(--text);}
+  .nav-cta{
+    padding:9px 18px; border-radius:7px; border:1px solid var(--amber);
+    color:var(--amber); font-size:13px; font-weight:500; letter-spacing:0.01em;
+    transition:all .15s;
+  }
+  .nav-cta:hover{background:var(--amber); color:#0D1013;}
+
+  /* ===== HERO ===== */
+  .hero{
+    padding:72px 40px 40px;
+    max-width:1180px; margin:0 auto;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono'; font-size:12px; color:var(--amber);
+    letter-spacing:0.12em; text-transform:uppercase; margin-bottom:18px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{content:''; width:16px; height:1px; background:var(--amber);}
+  .hero h1{
+    font-family:'Space Grotesk'; font-weight:600; font-size:52px; line-height:1.08;
+    letter-spacing:-0.01em; max-width:760px; margin-bottom:22px;
+  }
+  .hero h1 em{font-style:normal; color:var(--amber);}
+  .hero p{font-size:17px; line-height:1.6; color:var(--text-dim); max-width:600px; margin-bottom:36px;}
+  .hero-actions{display:flex; gap:14px; margin-bottom:56px;}
+  .btn-primary{
+    background:var(--amber); color:#0D1013; padding:13px 24px; border-radius:8px;
+    font-weight:600; font-size:14px; border:none; transition:transform .15s, box-shadow .15s;
+  }
+  .btn-primary:hover{transform:translateY(-1px); box-shadow:0 8px 24px rgba(232,162,61,0.25);}
+  .btn-ghost{
+    padding:13px 24px; border-radius:8px; border:1px solid var(--border);
+    color:var(--text-dim); font-size:14px; font-weight:500; transition:all .15s;
+  }
+  .btn-ghost:hover{border-color:var(--text-dim); color:var(--text);}
+
+  /* ===== LINE STRIP (signature element) ===== */
+  .line-strip-wrap{
+    border:1px solid var(--border); border-radius:var(--radius);
+    background:var(--panel); padding:22px 26px;
+  }
+  .line-strip-header{
+    display:flex; justify-content:space-between; align-items:baseline; margin-bottom:18px;
+  }
+  .line-strip-title{font-size:12px; color:var(--text-faint); font-family:'IBM Plex Mono'; letter-spacing:0.06em; text-transform:uppercase;}
+  .line-strip-legend{display:flex; gap:16px; font-size:11px; color:var(--text-faint); font-family:'IBM Plex Mono';}
+  .legend-dot{display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:5px; position:relative; top:-1px;}
+  .line-strip{display:flex; gap:6px; align-items:flex-end; height:64px;}
+  .line-bar{
+    flex:1; border-radius:4px 4px 2px 2px; position:relative; cursor:pointer;
+    transition:opacity .15s;
+    background:var(--green);
+  }
+  .line-bar:hover{opacity:0.75;}
+  .line-bar.idle{background:var(--border);}
+  .line-bar.watch{background:var(--amber);}
+  .line-bar .tip{
+    position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);
+    background:var(--panel-2); border:1px solid var(--border); border-radius:6px;
+    padding:6px 10px; font-size:11px; font-family:'IBM Plex Mono'; white-space:nowrap;
+    opacity:0; pointer-events:none; transition:opacity .15s; color:var(--text);
+  }
+  .line-bar:hover .tip{opacity:1;}
+  .line-labels{display:flex; gap:6px; margin-top:8px;}
+  .line-labels span{flex:1; text-align:center; font-size:10px; color:var(--text-faint); font-family:'IBM Plex Mono';}
+
+  /* ===== SECTION HEADERS ===== */
+  .section{max-width:1180px; margin:0 auto; padding:64px 40px;}
+  .section-head{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px; border-bottom:1px solid var(--border-soft); padding-bottom:20px;}
+  .section-head h2{font-family:'Space Grotesk'; font-size:26px; font-weight:600;}
+  .section-head p{color:var(--text-dim); font-size:14px; max-width:420px; text-align:right;}
+
+  /* ===== MODULE GRID ===== */
+  .module-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;
+  }
+  .module-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:22px; transition:border-color .15s, transform .15s;
+    display:flex; flex-direction:column; gap:14px; min-height:190px;
+  }
+  .module-card:hover{border-color:var(--amber-dim); transform:translateY(-2px);}
+  .module-top{display:flex; justify-content:space-between; align-items:flex-start;}
+  .module-icon{
+    width:38px; height:38px; border-radius:8px; background:var(--panel-2);
+    display:flex; align-items:center; justify-content:center; font-size:17px;
+    border:1px solid var(--border);
+  }
+  .module-status{
+    font-size:10px; font-family:'IBM Plex Mono'; padding:3px 8px; border-radius:20px;
+    border:1px solid var(--border); color:var(--text-faint); letter-spacing:0.04em;
+  }
+  .module-card h3{font-family:'Space Grotesk'; font-size:17px; font-weight:600; margin-bottom:4px;}
+  .module-card p{font-size:13px; color:var(--text-dim); line-height:1.55; flex:1;}
+  .module-open{
+    font-size:12px; color:var(--amber); font-family:'IBM Plex Mono'; display:flex; align-items:center; gap:6px;
+    margin-top:auto;
+  }
+  .module-open .arrow{transition:transform .15s;}
+  .module-card:hover .module-open .arrow{transform:translateX(3px);}
+
+  /* ===== ROADMAP ===== */
+  .roadmap-cat{margin-bottom:22px;}
+  .roadmap-cat h4{font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;}
+  .roadmap-chips{display:flex; flex-wrap:wrap; gap:8px;}
+  .roadmap-chip{
+    background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:8px 14px;
+    font-size:12.5px; color:var(--text-dim); display:flex; align-items:center; gap:7px;
+  }
+  .roadmap-chip .stage{
+    font-family:'IBM Plex Mono'; font-size:9.5px; color:var(--text-faint); border:1px solid var(--border);
+    border-radius:10px; padding:1px 6px;
+  }
+
+  /* ===== WORKFLOW STRIP ===== */
+  .workflow-strip{display:flex; align-items:stretch; gap:6px; overflow-x:auto; padding-bottom:6px;}
+  .workflow-step{
+    flex:1; min-width:110px; background:var(--panel); border:1px solid var(--border); border-radius:9px;
+    padding:14px 12px; text-align:center;
+  }
+  .workflow-step .n{font-family:'IBM Plex Mono'; font-size:10px; color:var(--amber); margin-bottom:6px;}
+  .workflow-step .t{font-size:12.5px; color:var(--text); font-weight:500; line-height:1.3;}
+  .workflow-arrow{display:flex; align-items:center; color:var(--text-faint); font-size:14px; flex-shrink:0;}
+
+  /* ===== ROADMAP ===== end */
+  .arch{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:32px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  }
+  .arch-node{
+    text-align:center; flex:1; min-width:120px;
+  }
+  .arch-node .box{
+    background:var(--panel-2); border:1px solid var(--border); border-radius:8px;
+    padding:14px 10px; font-family:'IBM Plex Mono'; font-size:12px; color:var(--text);
+    margin-bottom:8px;
+  }
+  .arch-node .label{font-size:11px; color:var(--text-faint);}
+  .arch-arrow{color:var(--text-faint); font-size:18px; flex-shrink:0;}
+
+  /* ===== RESULTS ===== */
+  .stat-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:16px;}
+  .stat-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:24px 20px;
+  }
+  .stat-move{
+    font-family:'IBM Plex Mono'; font-size:26px; font-weight:500; color:var(--text);
+    display:flex; align-items:baseline; gap:8px; margin-bottom:10px;
+  }
+  .stat-move .from{color:var(--text-faint); font-size:18px;}
+  .stat-move .arrow{color:var(--amber); font-size:16px;}
+  .stat-move .to{color:var(--green);}
+  .stat-label{font-size:13px; color:var(--text-dim); line-height:1.5;}
+  .results-note{font-size:12px; color:var(--text-faint); margin-top:20px; font-family:'IBM Plex Mono';}
+
+  /* ===== LIVE PREVIEW ===== */
+  .preview-panel{
+    background:var(--bg-2); border:1px solid var(--border); border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .preview-chrome{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px; border-bottom:1px solid var(--border-soft); background:var(--panel);
+  }
+  .preview-chrome-left{display:flex; align-items:center; gap:10px;}
+  .preview-live-tag{
+    font-size:10px; font-family:'IBM Plex Mono'; padding:3px 8px; border-radius:20px;
+    border:1px solid var(--green); color:var(--green); letter-spacing:0.04em;
+    display:flex; align-items:center; gap:5px;
+  }
+  .preview-live-tag .dot{width:5px; height:5px; border-radius:50%; background:var(--green);}
+  table.preview-table{width:100%; border-collapse:collapse; font-family:'IBM Plex Mono'; font-size:12.5px;}
+  table.preview-table th{
+    text-align:left; padding:12px 18px; color:var(--text-faint); font-weight:500;
+    border-bottom:1px solid var(--border-soft); font-size:11px; letter-spacing:0.04em; text-transform:uppercase;
+  }
+  table.preview-table td{padding:12px 18px; border-bottom:1px solid var(--border-soft); color:var(--text);}
+  table.preview-table tr:last-child td{border-bottom:none;}
+  .pill{
+    display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px;
+    font-size:11px; border:1px solid var(--border);
+  }
+  .pill .dot{width:6px; height:6px; border-radius:50%;}
+  .pill.run{color:var(--green); border-color:rgba(76,175,125,0.35);}
+  .pill.run .dot{background:var(--green);}
+  .pill.watch{color:var(--amber); border-color:rgba(232,162,61,0.35);}
+  .pill.watch .dot{background:var(--amber);}
+  .pill.idle{color:var(--text-faint); border-color:var(--border);}
+  .pill.idle .dot{background:var(--text-faint);}
+  .preview-caption{padding:14px 18px; font-size:12px; color:var(--text-faint); border-top:1px solid var(--border-soft);}
+
+  /* ===== PRICING ===== */
+  .pricing-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;}
+  .price-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    padding:26px; display:flex; flex-direction:column; gap:16px;
+  }
+  .price-card.featured{border-color:var(--amber-dim); position:relative;}
+  .price-tag{
+    position:absolute; top:-11px; left:24px; background:var(--amber); color:#0D1013;
+    font-size:10px; font-family:'IBM Plex Mono'; padding:3px 10px; border-radius:20px; font-weight:600;
+    letter-spacing:0.04em;
+  }
+  .price-name{font-family:'Space Grotesk'; font-size:18px; font-weight:600;}
+  .price-value{font-family:'IBM Plex Mono'; font-size:15px; color:var(--amber);}
+  .price-desc{font-size:13px; color:var(--text-dim); line-height:1.6;}
+  .price-list{list-style:none; display:flex; flex-direction:column; gap:9px; font-size:13px; color:var(--text-dim);}
+  .price-list li{display:flex; gap:8px;}
+  .price-list li::before{content:'—'; color:var(--text-faint); flex-shrink:0;}
+  .price-cta{
+    margin-top:auto; padding:11px; border-radius:7px; border:1px solid var(--border);
+    text-align:center; font-size:13px; color:var(--text-dim); transition:all .15s;
+  }
+  .price-card.featured .price-cta{border-color:var(--amber); color:var(--amber);}
+  .price-cta:hover{border-color:var(--text-dim); color:var(--text);}
+  .price-card.featured .price-cta:hover{background:var(--amber); color:#0D1013;}
+
+  /* ===== FOOTER ===== */
+  footer{
+    border-top:1px solid var(--border-soft); padding:28px 40px; margin-top:40px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:12px; color:var(--text-faint); font-family:'IBM Plex Mono';
+  }
+  .status-live{display:flex; align-items:center; gap:8px;}
+  .status-dot{width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px rgba(76,175,125,0.15);}
+
+  /* ===== MODAL (blank module preview) ===== */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(6,8,10,0.75); backdrop-filter:blur(4px);
+    display:none; align-items:center; justify-content:center; z-index:100; padding:30px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    width:100%; max-width:880px; max-height:82vh; background:var(--bg-2);
+    border:1px solid var(--border); border-radius:12px; overflow:hidden;
+    display:flex; flex-direction:column;
+    box-shadow:0 30px 80px rgba(0,0,0,0.5);
+  }
+  .modal-chrome{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px; border-bottom:1px solid var(--border-soft); background:var(--panel);
+  }
+  .modal-chrome-left{display:flex; align-items:center; gap:10px;}
+  .dot-row{display:flex; gap:6px;}
+  .dot-row span{width:9px; height:9px; border-radius:50%; background:var(--border);}
+  .modal-title{font-family:'IBM Plex Mono'; font-size:12px; color:var(--text-dim);}
+  .modal-close{color:var(--text-faint); font-size:20px; line-height:1; padding:4px 8px; border-radius:6px;}
+  .modal-close:hover{background:var(--panel-2); color:var(--text);}
+  .modal-tabs{display:flex; gap:2px; padding:0 18px; border-bottom:1px solid var(--border-soft); background:var(--bg-2);}
+  .modal-tab{
+    padding:12px 16px; font-size:13px; color:var(--text-faint); border-bottom:2px solid transparent;
+  }
+  .modal-tab.active{color:var(--text); border-color:var(--amber);}
+  .modal-body{padding:50px 30px; flex:1; overflow:auto; display:flex; align-items:center; justify-content:center;}
+  .blank-state{text-align:center; max-width:360px;}
+  .blank-state .glyph{
+    width:56px; height:56px; border-radius:12px; border:1px dashed var(--border);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 20px;
+    font-size:22px; color:var(--text-faint);
+  }
+  .blank-state h4{font-family:'Space Grotesk'; font-size:16px; margin-bottom:8px; font-weight:600;}
+  .blank-state p{font-size:13px; color:var(--text-faint); line-height:1.6;}
+
+  @media (max-width: 860px){
+    .module-grid{grid-template-columns:1fr;}
+    .hero h1{font-size:36px;}
+    nav{padding:16px 20px;}
+    .hero, .section{padding-left:20px; padding-right:20px;}
+    .section-head{flex-direction:column; align-items:flex-start; gap:8px;}
+    .section-head p{text-align:left;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <div class="brand-mark">B</div>
+    <div>
+      <div class="brand-name">Barber-OES</div>
+      <div class="brand-sub">OPERATIONAL ECOSYSTEM</div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a href="#results">Results</a>
+    <a href="#modules">Modules</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#about">About</a>
+    <a href="#engagement">Engagement</a>
+    <a href="#" class="nav-cta">Request walkthrough</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="eyebrow">Built for multi-line manufacturing floors</div>
+  <h1>One system for every line, batch, and shift on the floor — <em>from raw material to OEE.</em></h1>
+  <p>Barber-OES unifies batch and material tracking, production scheduling, floor coordination, and real-time OEE reporting into a single operational layer — replacing the spreadsheets and file hand-offs that slow a plant down.</p>
+  <div class="hero-actions">
+    <button class="btn-primary">See it on your floor</button>
+    <button class="btn-ghost">Download overview</button>
+  </div>
+
+  <div class="line-strip-wrap">
+    <div class="line-strip-header">
+      <div class="line-strip-title">Line status — live view</div>
+      <div class="line-strip-legend">
+        <span><span class="legend-dot" style="background:var(--green)"></span>Running</span>
+        <span><span class="legend-dot" style="background:var(--amber)"></span>Changeover</span>
+        <span><span class="legend-dot" style="background:var(--border)"></span>Idle</span>
+      </div>
+    </div>
+    <div class="line-strip" id="lineStrip"></div>
+    <div class="line-labels" id="lineLabels"></div>
+  </div>
+</section>
+
+<section class="section" id="results">
+  <div class="section-head">
+    <h2>What this kind of system actually moves</h2>
+    <p>Numbers from floors I've personally run — not projections.</p>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-move"><span class="from">82%</span><span class="arrow">→</span><span class="to">97%</span></div>
+      <div class="stat-label">Schedule attainment, driven by live scheduling and changeover visibility.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-move"><span class="from">46%</span><span class="arrow">→</span><span class="to">60%</span></div>
+      <div class="stat-label">Overall Equipment Effectiveness (OEE), from floor-execution and downtime tracking.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-move"><span class="to">76</span></div>
+      <div class="stat-label">Person workforce moved off paper roll-call onto a digital daily tracking system.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-move"><span class="to">75+</span></div>
+      <div class="stat-label">Continuous-improvement findings actioned in under a year through structured floor walks.</div>
+    </div>
+  </div>
+  <div class="results-note">Results from operations personally led — not third-party case studies.</div>
+</section>
+
+<section class="section" id="modules">
+  <div class="section-head">
+    <h2>Built around your departments — not a fixed module list</h2>
+    <p>These are common building blocks. What actually gets built is mapped to your departments, your data, and the systems you already run.</p>
+  </div>
+  <div class="module-grid" id="moduleGrid"></div>
+</section>
+
+<section class="section" id="example-build">
+  <div class="section-head">
+    <h2>No two builds look the same</h2>
+    <p>Two plants, two completely different scopes — for example only.</p>
+  </div>
+  <div class="preview-panel">
+    <div class="preview-chrome">
+      <div class="preview-chrome-left">
+        <div class="dot-row"><span></span><span></span><span></span></div>
+        <span class="modal-title mono">For example only — not real clients</span>
+      </div>
+      <div class="preview-live-tag"><span class="dot"></span>ILLUSTRATIVE</div>
+    </div>
+    <div style="padding:22px 24px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+        <div>
+          <div style="font-family:'IBM Plex Mono'; font-size:11px; color:var(--amber); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:12px;">A packaging plant might track</div>
+          <div style="font-size:11px; color:var(--text-faint); margin-bottom:6px;">DEPARTMENTS</div>
+          <div class="roadmap-chips" style="margin-bottom:16px;">
+            <div class="roadmap-chip">Finishing</div>
+            <div class="roadmap-chip">Printing</div>
+            <div class="roadmap-chip">Forming</div>
+            <div class="roadmap-chip">Warehouse</div>
+            <div class="roadmap-chip">Maintenance</div>
+          </div>
+          <div style="font-size:11px; color:var(--text-faint); margin-bottom:6px;">METRICS</div>
+          <div class="roadmap-chips" style="margin-bottom:16px;">
+            <div class="roadmap-chip">WIP</div>
+            <div class="roadmap-chip">OEE</div>
+            <div class="roadmap-chip">Scrap</div>
+            <div class="roadmap-chip">FG</div>
+            <div class="roadmap-chip">Shipping</div>
+          </div>
+          <div style="font-size:11px; color:var(--text-faint); margin-bottom:6px;">SYSTEMS IT CONNECTS TO</div>
+          <div class="roadmap-chips">
+            <div class="roadmap-chip">SAP</div>
+            <div class="roadmap-chip">Ignition</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:'IBM Plex Mono'; font-size:11px; color:var(--teal); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:12px;">A personal care plant might track</div>
+          <div style="font-size:11px; color:var(--text-faint); margin-bottom:6px;">DEPARTMENTS</div>
+          <div class="roadmap-chips" style="margin-bottom:16px;">
+            <div class="roadmap-chip">Compounding</div>
+            <div class="roadmap-chip">Filling</div>
+            <div class="roadmap-chip">Packaging</div>
+            <div class="roadmap-chip">Quality</div>
+          </div>
+          <div style="font-size:11px; color:var(--text-faint); margin-bottom:6px;">METRICS</div>
+          <div class="roadmap-chips" style="margin-bottom:16px;">
+            <div class="roadmap-chip">Batch attainment</div>
+            <div class="roadmap-chip">OEE</div>
+            <div class="roadmap-chip">Changeover time</div>
+          </div>
+          <div style="font-size:11px; color:var(--text-faint); margin-bottom:6px;">SYSTEMS IT CONNECTS TO</div>
+          <div class="roadmap-chips">
+            <div class="roadmap-chip">Spreadsheets only</div>
+            <div class="roadmap-chip">No ERP yet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-caption">Neither of these is a real client. The point: what gets built depends entirely on discovery — your departments, your metrics, your systems, not a template.</div>
+  </div>
+</section>
+
+<section class="section" id="workflow">
+  <div class="section-head">
+    <h2>The core batch workflow</h2>
+    <p>A common backbone sequence — one connected line, not disconnected hand-offs. Yours may look different.</p>
+  </div>
+  <div class="workflow-strip" id="workflowStrip"></div>
+</section>
+
+<section class="section" id="roadmap">
+  <div class="section-head">
+    <h2>The full platform</h2>
+    <p>Available now shown above. Everything below is real roadmap territory — the specific mix depends on your operation.</p>
+  </div>
+  <div id="roadmapWrap"></div>
+</section>
+
+<section class="section" id="preview">
+  <div class="section-head">
+    <h2>Not everything stays blank</h2>
+    <p>Sample view of Floor Coordinator — this is what a live shift looks like once it's connected.</p>
+  </div>
+  <div class="preview-panel">
+    <div class="preview-chrome">
+      <div class="preview-chrome-left">
+        <div class="dot-row"><span></span><span></span><span></span></div>
+        <span class="modal-title mono">Floor Coordinator — Command Center</span>
+      </div>
+      <div class="preview-live-tag"><span class="dot"></span>SAMPLE DATA</div>
+    </div>
+    <table class="preview-table">
+      <thead>
+        <tr><th>Line</th><th>Batch</th><th>Product</th><th>Status</th><th>Attainment</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Line 03</td><td class="mono">B-11842</td><td>Body lotion, 8oz</td><td><span class="pill run"><span class="dot"></span>Running</span></td><td class="mono">104%</td></tr>
+        <tr><td>Line 07</td><td class="mono">B-11846</td><td>Shampoo, 12oz</td><td><span class="pill watch"><span class="dot"></span>Changeover</span></td><td class="mono">—</td></tr>
+        <tr><td>Line 02</td><td class="mono">B-11839</td><td>Hand soap, 16oz</td><td><span class="pill run"><span class="dot"></span>Running</span></td><td class="mono">97%</td></tr>
+        <tr><td>Line 09</td><td class="mono">—</td><td>—</td><td><span class="pill idle"><span class="dot"></span>Idle</span></td><td class="mono">—</td></tr>
+        <tr><td>Line 05</td><td class="mono">B-11844</td><td>Conditioner, 8oz</td><td><span class="pill run"><span class="dot"></span>Running</span></td><td class="mono">91%</td></tr>
+      </tbody>
+    </table>
+    <div class="preview-caption">Every other module in this prototype stays blank on purpose — connected to your data, it looks like this.</div>
+  </div>
+</section>
+
+<section class="section" id="architecture">
+  <div class="section-head">
+    <h2>How data moves</h2>
+    <p>One upload hub, one source of truth, synced live to every module and every device.</p>
+  </div>
+  <div class="arch">
+    <div class="arch-node">
+      <div class="box">ERP · OEE Monitoring · MES</div>
+      <div class="label">Floor & ERP sources</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node">
+      <div class="box">Data Upload Hub</div>
+      <div class="label">Single source of truth</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node">
+      <div class="box">Real-time sync layer</div>
+      <div class="label">Cross-device, live</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-node">
+      <div class="box">Every Barber-OES module</div>
+      <div class="label">Always current</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="about">
+  <div class="section-head">
+    <h2>Who's building this</h2>
+  </div>
+  <div class="preview-panel">
+    <div style="padding:26px; display:flex; gap:20px; align-items:flex-start;">
+      <div style="width:48px; height:48px; border-radius:10px; flex-shrink:0; background:linear-gradient(135deg, var(--amber), var(--amber-dim)); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700; font-size:18px; color:#0D1013;">WB</div>
+      <div>
+        <div style="font-family:'Space Grotesk'; font-weight:700; font-size:18px; color:var(--text); margin-bottom:2px;">Willie Barber</div>
+        <div style="font-size:12.5px; color:var(--text-faint); margin-bottom:12px;">Manufacturing Operations Leader &middot; Barber Enterprise International, LLC</div>
+        <p style="font-size:14px; color:var(--text-dim); line-height:1.6; max-width:640px;">10+ years leading plant operations across packaging, logistics, and industrial manufacturing — driving schedule attainment from 82% to 97% and OEE from 46% to 60% on floors personally run. Barber-OES was built from firsthand experience running a real production floor, not as an outside software vendor pitching a theory.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="engagement">
+  <div class="section-head">
+    <h2>Ways to work together</h2>
+    <p>Start small, prove it, then scale up.</p>
+  </div>
+  <div class="pricing-grid" style="grid-template-columns:repeat(4,1fr);">
+    <div class="price-card">
+      <div class="price-name">Day-Rate Consulting</div>
+      <div class="price-value">$900 / day</div>
+      <div class="price-desc">On-site or remote operations work, billed by the day. No commitment beyond the day itself.</div>
+      <ul class="price-list">
+        <li>Floor walks & assessment</li>
+        <li>Scheduling / capacity review</li>
+        <li>No long-term commitment</li>
+      </ul>
+      <div class="price-cta">Lowest barrier</div>
+    </div>
+    <div class="price-card">
+      <div class="price-name">Operations Diagnostic</div>
+      <div class="price-value">$2,500 flat</div>
+      <div class="price-desc">A 1–2 week floor assessment. I walk your lines, quantify what manual tracking is actually costing you, and hand you a findings report.</div>
+      <ul class="price-list">
+        <li>On-site or remote floor review</li>
+        <li>Quantified cost of current process</li>
+        <li>Written findings report</li>
+      </ul>
+      <div class="price-cta">Start here</div>
+    </div>
+    <div class="price-card featured">
+      <div class="price-tag">Most common</div>
+      <div class="price-name">Managed Retainer</div>
+      <div class="price-value">From $1,800 / mo</div>
+      <div class="price-desc">I build the system sized to your floor, host it, and stay on to maintain, tune, and add modules as you grow.</div>
+      <ul class="price-list">
+        <li>Full build across chosen modules</li>
+        <li>Ongoing hosting & support</li>
+        <li>No in-house IT hire needed</li>
+      </ul>
+      <div class="price-cta">Most flexible</div>
+    </div>
+    <div class="price-card">
+      <div class="price-name">Standalone Build</div>
+      <div class="price-value">From $18,000</div>
+      <div class="price-desc">I build and hand off a system sized to your operation. You own it and run it — no recurring fee.</div>
+      <ul class="price-list">
+        <li>Full build & handoff</li>
+        <li>Documentation for your team</li>
+        <li>You own and operate it</li>
+      </ul>
+      <div class="price-cta">You own it</div>
+    </div>
+  </div>
+  <div class="results-note" style="margin-top:16px;">Diagnostic fee is credited toward Standalone Build or the first month of Retainer if you move forward within 30 days. Standalone Build: 30% due at signing, remainder on delivery.</div>
+
+  <div style="margin-top:36px; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:26px;">
+    <h3 style="font-family:'Space Grotesk'; font-size:16px; margin-bottom:14px; color:var(--text);">What moves the price above $18,000</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div style="display:flex; gap:10px;"><span style="color:var(--amber);">→</span><span style="font-size:13px; color:var(--text-dim);"><b style="color:var(--text);">Line / site count</b> — base covers up to 5 lines, 1 site; more lines means more config and validation work.</span></div>
+      <div style="display:flex; gap:10px;"><span style="color:var(--amber);">→</span><span style="font-size:13px; color:var(--text-dim);"><b style="color:var(--text);">Multiple facilities</b> — each site needs its own config layer and sync setup.</span></div>
+      <div style="display:flex; gap:10px;"><span style="color:var(--amber);">→</span><span style="font-size:13px; color:var(--text-dim);"><b style="color:var(--text);">Roadmap modules</b> — Continuous Improvement Tracker, Event/Alert Engine, and similar are separate build work beyond the core 6.</span></div>
+      <div style="display:flex; gap:10px;"><span style="color:var(--amber);">→</span><span style="font-size:13px; color:var(--text-dim);"><b style="color:var(--text);">ERP / system integration</b> — pulling live from your existing ERP, WMS, or BI tools is bespoke work, priced per system.</span></div>
+      <div style="display:flex; gap:10px;"><span style="color:var(--amber);">→</span><span style="font-size:13px; color:var(--text-dim);"><b style="color:var(--text);">Tuned AI Insights</b> — a version trained on your historical data, not just live snapshots.</span></div>
+      <div style="display:flex; gap:10px;"><span style="color:var(--amber);">→</span><span style="font-size:13px; color:var(--text-dim);"><b style="color:var(--text);">Compliance / validation</b> — FDA or similarly regulated environments need documented validation work (e.g. 21 CFR Part 11).</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="status-live"><span class="status-dot"></span> Prototype build — no production data connected</div>
+  <div>Barber-OES · v0.1 · Configurable to any line count</div>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-chrome">
+      <div class="modal-chrome-left">
+        <div class="dot-row"><span></span><span></span><span></span></div>
+        <div class="modal-title mono" id="modalTitle">Module</div>
+      </div>
+      <button class="modal-close" id="modalClose">&times;</button>
+    </div>
+    <div class="modal-tabs" id="modalTabs"></div>
+    <div class="modal-body">
+      <div class="blank-state">
+        <div class="glyph">＋</div>
+        <h4 id="blankTitle">Nothing loaded yet</h4>
+        <p id="blankCopy">This is where your data goes. Connect this module to a production line and the workspace fills in automatically.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Line strip — sample production lines, mostly running, a couple in changeover / idle
+  const lineStates = ['run','run','run','watch','run','run','idle','run','run','watch','run'];
+  const stripEl = document.getElementById('lineStrip');
+  const labelsEl = document.getElementById('lineLabels');
+  const heights = [70,55,80,40,65,90,25,60,75,35,50];
+
+  lineStates.forEach((state, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'line-bar ' + (state === 'run' ? '' : state);
+    bar.style.height = heights[i] + '%';
+    const tip = document.createElement('div');
+    tip.className = 'tip';
+    const statusText = state === 'run' ? 'Running' : state === 'watch' ? 'Changeover' : 'Idle';
+    tip.textContent = 'Line ' + (i+1) + ' — ' + statusText;
+    bar.appendChild(tip);
+    stripEl.appendChild(bar);
+
+    const label = document.createElement('span');
+    label.textContent = 'L' + (i+1);
+    labelsEl.appendChild(label);
+  });
+
+  // Modules
+  const modules = [
+    {
+      icon: '⧉', name: 'Batch Coordinator', status: 'CORE',
+      desc: 'Tracks raw-material inventory against production demand, flagging shortages before they hit the floor.',
+      tabs: ['Overview', 'Inventory', 'Demand'],
+      blank: 'No inventory data loaded', copy: 'Connect your raw material master to see live inventory positions against upcoming batches.'
+    },
+    {
+      icon: '⏱', name: 'Material Prep Scheduler', status: 'CORE',
+      desc: 'Sequences material prep and staging tasks by batch priority, keeping production fed without overloading prep stations.',
+      tabs: ['Queue', 'Assignments', 'History'],
+      blank: 'Queue is empty', copy: 'Prep tasks will populate here once batches are scheduled for the day.'
+    },
+    {
+      icon: '☰', name: 'Production Scheduler', status: 'CORE',
+      desc: 'Plans production runs across shifts, balancing capacity, labor, and downstream demand.',
+      tabs: ['Schedule', 'Capacity', 'Conflicts'],
+      blank: 'No schedule built', copy: 'Build a production schedule and capacity conflicts will surface here automatically.'
+    },
+    {
+      icon: '⌘', name: 'Floor Coordinator', status: 'CORE',
+      desc: 'The floor-facing hub for batch status, line assignments, and shift hand-offs across every production line.',
+      tabs: ['Command Center', 'Lines', 'Hand-offs'],
+      blank: 'No active shift', copy: 'Once a shift starts, batch and line status will stream in here in real time.'
+    },
+    {
+      icon: '▤', name: 'Plant Supervisor', status: 'CORE',
+      desc: 'Executive-level view across command center, capacity forecast, all batches, and sync status.',
+      tabs: ['Command Center', 'Capacity Forecast', 'All Batches', 'Sync & Export'],
+      blank: 'No plant data yet', copy: 'This is the supervisor rollup — it stays empty until modules below start reporting in.'
+    },
+    {
+      icon: '⇅', name: 'Sync & Export Hub', status: 'UTILITY',
+      desc: 'Keeps every device on the same data, and exports clean reporting sets for leadership reviews.',
+      tabs: ['Sync Status', 'Export'],
+      blank: 'Nothing to sync', copy: 'Once connected, every device will show the same batch data — live, with no manual file passing.'
+    },
+  ];
+
+  const grid = document.getElementById('moduleGrid');
+  modules.forEach((m, idx) => {
+    const card = document.createElement('div');
+    card.className = 'module-card';
+    card.innerHTML = `
+      <div class="module-top">
+        <div class="module-icon">${m.icon}</div>
+        <div class="module-status">${m.status}</div>
+      </div>
+      <div>
+        <h3>${m.name}</h3>
+        <p>${m.desc}</p>
+      </div>
+      <div class="module-open">Open module <span class="arrow">→</span></div>
+    `;
+    card.addEventListener('click', () => openModal(idx));
+    grid.appendChild(card);
+  });
+
+  // Core workflow strip
+  const workflow = [
+    'Material Gate', 'Prep / Staging', 'Batch Scheduling', 'Quality Release',
+    'Line Readiness', 'Production Execution', 'FG Reconciliation', 'Warehouse Movement'
+  ];
+  const wfStrip = document.getElementById('workflowStrip');
+  workflow.forEach((step, i) => {
+    const box = document.createElement('div');
+    box.className = 'workflow-step';
+    box.innerHTML = `<div class="n">STEP ${i+1}</div><div class="t">${step}</div>`;
+    wfStrip.appendChild(box);
+    if (i < workflow.length - 1) {
+      const arrow = document.createElement('div');
+      arrow.className = 'workflow-arrow';
+      arrow.textContent = '→';
+      wfStrip.appendChild(arrow);
+    }
+  });
+
+  // Platform roadmap
+  const roadmap = [
+    { cat: 'Floor Tools', items: ['Attendance / Roll Call', 'Data Upload Hub', 'System Diagnostics', 'Vessel / Tank Board', 'Open Purchase Orders', 'Next-Period Preview', 'Inventory Management', 'Scrap Tracker'] },
+    { cat: 'Management & Oversight', items: ['Continuous Improvement Tracker', 'Event / Alert Engine', 'Executive Control Tower', 'Changeover Dashboard'] },
+    { cat: 'Support Infrastructure', items: ['Onboarding & Training Guide', 'Sync Bus', 'Reporting & Integration Layer'] },
+  ];
+  const roadmapWrap = document.getElementById('roadmapWrap');
+  roadmap.forEach(group => {
+    const catDiv = document.createElement('div');
+    catDiv.className = 'roadmap-cat';
+    const chips = group.items.map(item => `<div class="roadmap-chip"><span class="stage">ROADMAP</span>${item}</div>`).join('');
+    catDiv.innerHTML = `<h4>${group.cat}</h4><div class="roadmap-chips">${chips}</div>`;
+    roadmapWrap.appendChild(catDiv);
+  });
+
+  const overlay = document.getElementById('modalOverlay');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalTabs = document.getElementById('modalTabs');
+  const blankTitle = document.getElementById('blankTitle');
+  const blankCopy = document.getElementById('blankCopy');
+
+  function openModal(idx){
+    const m = modules[idx];
+    modalTitle.textContent = m.name;
+    blankTitle.textContent = m.blank;
+    blankCopy.textContent = m.copy;
+    modalTabs.innerHTML = '';
+    m.tabs.forEach((t, i) => {
+      const tab = document.createElement('div');
+      tab.className = 'modal-tab' + (i === 0 ? ' active' : '');
+      tab.textContent = t;
+      tab.addEventListener('click', () => {
+        [...modalTabs.children].forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+      });
+      modalTabs.appendChild(tab);
+    });
+    overlay.classList.add('open');
+  }
+
+  document.getElementById('modalClose').addEventListener('click', () => overlay.classList.remove('open'));
+  overlay.addEventListener('click', (e) => { if(e.target === overlay) overlay.classList.remove('open'); });
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') overlay.classList.remove('open'); });
+</script>
+
+</body>
+</html>
